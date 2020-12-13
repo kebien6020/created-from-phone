@@ -6,44 +6,63 @@ import {
   ListItemText,
   TextField,
   Paper,
+  styled,
 } from '@material-ui/core'
 import { Formik } from 'formik'
 import { createThing, listThings } from './api/things'
 
 export const ThingList = () => {
   const [things, {refresh}] = useThings()
-  const handleSubmit = async (values) => {
+  return (
+    <>
+      <Paper>
+        <List>
+          {things?.map((thing, idx) =>
+            <ListItem key={idx}>
+              <ListItemText>
+                {thing.name}
+              </ListItemText>
+            </ListItem>
+          ) ?? null}
+        </List>
+      </Paper>
+      <AddSection refresh={refresh} style={{marginTop: 16}} />
+    </>
+  )
+}
+
+const AddSection = ({refresh, ...props}) => {
+  const submit = async (values) => {
     await createThing(values)
     refresh()
   }
+
   return (
-    <Paper>
-      <List>
-        {things?.map((thing, idx) =>
-          <ListItem key={idx}>
-            <ListItemText>
-              {thing.name}
-            </ListItemText>
-          </ListItem>
-        ) ?? null}
-      </List>
+    <AddWrapper {...props}>
       <Formik
         initialValues={{name: ''}}
-        onSubmit={handleSubmit}
+        onSubmit={submit}
       >
-        {({handleSubmit, values, handleChange}) => <form onSubmit={handleSubmit}>
-          <TextField
-            name='name'
-            value={values.name}
-            onChange={handleChange}
-          />
-          <Button type='submit'>Submit</Button>
-        </form>}
+        {({submit, values, handleChange}) =>
+          <form onSubmit={submit}>
+            <TextField
+              name='name'
+              label='Add a new thing'
+              value={values.name}
+              onChange={handleChange}
+              fullWidth
+            />
+          </form>
+        }
       </Formik>
-      Cambios en tiempo real
-    </Paper>
-  )
+    </AddWrapper>
+  );
 }
+
+const AddWrapper = styled(Paper)({
+  padding: 16,
+  paddingBottom: 8,
+})
 
 const useThings = () => {
   const [things, setThings] = useState(null)

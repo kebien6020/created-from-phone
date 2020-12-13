@@ -1,18 +1,20 @@
 version: '3.8'
 
 services:
-  web:
-    image: nginx:1.19
-    ports:
-      - 80:80
-    volumes:
-      - ./public:/usr/share/nginx/html:ro
+  # web:
+  #   image: nginx:1.19
+  #   ports:
+  #     - 80:80
+  #   volumes:
+  #     - ./public:/usr/share/nginx/html:ro
   node:
     image: node:14-alpine
     working_dir: /app
     volumes:
       - ./:/app
-    command: ["tail", "-f", "/dev/null"]
+    command: npx webpack serve --host 0.0.0.0 # allow connections from everywhere
+    ports:
+      - 8080:8080
   back:
     image: node:14-alpine
     working_dir: /app
@@ -30,4 +32,4 @@ services:
     environment:
       ADMINER_DESIGN: pepa-linha
     ports:
-      - 8080:8080
+      - 8081:8080
